@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import userImage from '../../assets/images/user.png'; // replace with actual user image path
+import userImage from '../../assets/images/user.png';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
