@@ -4,7 +4,7 @@ import signUpImage from "../../assets/images/signup.png"
 
 const Signup: React.FC = () => {
   return (
-    <div className="flex items-center justify-center bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="flex max-w-4xl w-full bg-white">
         <div className="hidden md:block md:w-1/2 bg-cover">
           <img src={signUpImage} alt="Sign In" className="object-cover rounded-l-lg" />

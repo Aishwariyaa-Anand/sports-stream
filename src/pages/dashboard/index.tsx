@@ -5,18 +5,16 @@ import Navbar from '../../layout/dashboard/navbar';
 
 const Dashboard = () => {
   return (
-    <div>
+    <div className="flex w-full flex-col h-screen">
       <Navbar />
-      <div className="container mx-auto py-8">
-        { /*<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="col-span-1">
-            <LiveGames />
-          </div>
-          <div className="col-span-2">
-            <TrendingNews />
-          </div>
-        </div> */ }
-      </div>
+        { /*<div className="flex flex-grow">
+        <div className="w-1/4 bg-gray-200">
+          <LiveGames />
+        </div>
+        <div className="w-3/4">
+          <TrendingNews />
+        </div>
+      </div> */ }
     </div>
   );
 };
