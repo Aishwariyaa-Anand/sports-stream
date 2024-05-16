@@ -13,7 +13,6 @@ const LiveCard = ({ match }) => {
         }
         const data = await response.json();
         setMatchDetails(data);
-        console.log(data);
       } catch (error) {
         console.error('Error fetching match details:', error);
       }
