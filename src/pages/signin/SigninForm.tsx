@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINT } from '../../config/constants';
+import { useAuth } from '../../context/AuthContext';
 
 const SigninForm: React.FC = () => {
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ const SigninForm: React.FC = () => {
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data.user));
       console.log(data.token);
+      signIn(data.user);
       navigate("/dashboard");
 
     } catch (error) {

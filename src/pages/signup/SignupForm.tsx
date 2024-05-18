@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINT } from '../../config/constants';
+import { useAuth } from '../../context/AuthContext';
 
 const SignupForm: React.FC = () => {
+  const { signIn } = useAuth();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -26,6 +28,7 @@ const SignupForm: React.FC = () => {
 
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data.user));
+      signIn(data.user);
       navigate("/dashboard");
       
       // Dialogue: After successful signup we have to redirect the user to the secured page. We will do that later.
