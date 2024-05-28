@@ -1,12 +1,14 @@
 // src/components/Layouts/Navbar.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import userImage from '../../assets/images/user.png';
+import ChangePasswordModal from '../../pages/changepass/ChangePasswordModal';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
     signOut();
@@ -35,7 +37,7 @@ const Navbar = () => {
                   My Preferences
                 </button>
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => setIsModalOpen(true)}
                   className="block px-4 py-2 text-sm w-full text-left hover:bg-gray-200"
                 >
                   Change Password
@@ -53,6 +55,10 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      <ChangePasswordModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </nav>
   );
 };
