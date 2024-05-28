@@ -5,7 +5,9 @@ import { API_ENDPOINT } from '../../config/constants';
 const News = () => {
   const [articles, setArticles] = useState([]);
   const [sports, setSports] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [selectedSport, setSelectedSport] = useState('');
+  const [selectedTeam, setSelectedTeam] = useState('');
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -34,43 +36,92 @@ const News = () => {
       }
     };
 
+    const fetchTeams = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINT}/teams`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch teams');
+        }
+        const data = await response.json();
+        setTeams(data);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+    };
+
     fetchArticles();
     fetchSports();
+    fetchTeams();
   }, []);
 
-  const handleSportChange = (event) => {
-    setSelectedSport(event.target.value);
+  const handleSportChange = (sport) => {
+    setSelectedSport(sport);
+    setSelectedTeam('');
   };
 
-  const filteredArticles = selectedSport
-    ? articles.filter(article => article.sport.name === selectedSport)
-    : articles;
+  const handleTeamChange = (event) => {
+    setSelectedTeam(event.target.value);
+  };
+
+  const filteredArticles = selectedTeam
+    ? articles.filter(article => article.teams && article.teams.some(team => team.name === selectedTeam))
+    : selectedSport
+      ? articles.filter(article => article.sport && article.sport.name === selectedSport)
+      : articles;
+
+  const filteredTeams = selectedSport
+    ? teams.filter(team => team.plays === selectedSport)
+    : teams;
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Trending News</h1>
       
-      <div className="mb-4">
-        <label htmlFor="sport-filter" className="mr-2">Filter by Sport:</label>
-        <select
-          id="sport-filter"
-          value={selectedSport}
-          onChange={handleSportChange}
-          className="p-2 border rounded"
-        >
-          <option value="">Trending News</option>
+      <div className="mb-4 flex justify-between items-center">
+        <div className="flex space-x-4 overflow-x-auto">
+          <button
+            onClick={() => handleSportChange('')}
+            className={`p-2 ${selectedSport === '' ? 'border-b-2 border-blue-500' : ''}`}
+          >
+            All
+          </button>
           {sports.map(sport => (
-            <option key={sport.id} value={sport.name}>
+            <button
+              key={sport.id}
+              onClick={() => handleSportChange(sport.name)}
+              className={`p-2 ${selectedSport === sport.name ? 'border-b-2 border-blue-500' : ''}`}
+            >
               {sport.name}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
+
+        <div className="ml-4">
+          <label htmlFor="team-filter" className="mr-2">Filter by Team:</label>
+          <select
+            id="team-filter"
+            value={selectedTeam}
+            onChange={handleTeamChange}
+            className="p-2 border rounded"
+          >
+            <option value="">All Teams</option>
+            {filteredTeams.map(team => (
+              <option key={team.id} value={team.name}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="w-full max-w-full mx-auto h-96 overflow-y-auto">
-        {filteredArticles.map(article => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+        {filteredArticles.length > 0 ? (
+          filteredArticles.map(article => (
+            <ArticleCard key={article.id} article={article} />
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No articles available for the selected filter.</p>
+        )}
       </div>
     </div>
   );
