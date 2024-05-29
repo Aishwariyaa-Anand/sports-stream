@@ -116,9 +116,11 @@ const News = () => {
 
       <div className="w-full max-w-full mx-auto h-96 overflow-y-auto">
         {filteredArticles.length > 0 ? (
-          filteredArticles.map(article => (
-            <ArticleCard key={article.id} article={article} />
-          ))
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredArticles.map(article => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
         ) : (
           <p className="text-center text-gray-500">No articles available for the selected filter.</p>
         )}

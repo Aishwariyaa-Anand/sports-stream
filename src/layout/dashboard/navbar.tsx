@@ -4,11 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import userImage from '../../assets/images/user.png';
 import ChangePasswordModal from '../../pages/changepass/ChangePasswordModal';
+import PreferenceModal from '../../pages/preferences/PreferenceModal';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPreModalOpen, setIsPreModalOpen] = useState(false);
 
   const handleLogout = () => {
     signOut();
@@ -31,7 +33,7 @@ const Navbar = () => {
               />
               <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => setIsPreModalOpen(true)}
                   className="block px-4 py-2 text-sm w-full text-left hover:bg-gray-200"
                 >
                   My Preferences
@@ -58,6 +60,10 @@ const Navbar = () => {
       <ChangePasswordModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      <PreferenceModal
+        isOpen={isPreModalOpen}
+        onClose={() => setIsPreModalOpen(false)} 
       />
     </nav>
   );
