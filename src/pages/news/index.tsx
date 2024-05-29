@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from './ArticleCard';
 import { API_ENDPOINT } from '../../config/constants';
+import { useAuth } from '../../context/AuthContext';
 
 const News = () => {
+  const { user, preferences } = useAuth();
   const [articles, setArticles] = useState([]);
   const [sports, setSports] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -63,15 +65,33 @@ const News = () => {
     setSelectedTeam(event.target.value);
   };
 
-  const filteredArticles = selectedTeam
-    ? articles.filter(article => article.teams && article.teams.some(team => team.name === selectedTeam))
-    : selectedSport
-      ? articles.filter(article => article.sport && article.sport.name === selectedSport)
-      : articles;
+  const getFilteredArticles = () => {
+    let filtered = articles;
+    if (user && preferences) {
+      filtered = filtered.filter(article =>
+        (article.sport && preferences.preferences.sports.includes(article.sport.id)) ||
+        (article.teams && article.teams.some(team => preferences.preferences.teams.includes(team.id)))
+      );
+    }
+    if (selectedSport) {
+      filtered = filtered.filter(article => article.sport && article.sport.name === selectedSport);
+    }
+    if (selectedTeam) {
+      filtered = filtered.filter(article => article.teams && article.teams.some(team => team.name === selectedTeam));
+    }
+    return filtered;
+  };
 
-  const filteredTeams = selectedSport
-    ? teams.filter(team => team.plays === selectedSport)
+
+  const displayedSports = user && preferences && preferences.preferences && preferences.preferences.sports ? sports.filter(sport => preferences.preferences.sports.includes(sport.id)) : sports;
+  const displayedTeams = selectedSport
+    ? (user && preferences && preferences.preferences && preferences.preferences.teams) 
+      ? teams.filter(team => preferences.preferences.teams.includes(team.id) && team.plays === selectedSport) 
+      : teams.filter(team => team.plays === selectedSport)
+    : user && preferences && preferences.preferences && preferences.preferences.teams
+    ? teams.filter(team => preferences.preferences.teams.includes(team.id))
     : teams;
+
 
   return (
     <div>
@@ -85,7 +105,7 @@ const News = () => {
           >
             All
           </button>
-          {sports.map(sport => (
+          {displayedSports.map(sport => (
             <button
               key={sport.id}
               onClick={() => handleSportChange(sport.name)}
@@ -105,7 +125,7 @@ const News = () => {
             className="p-2 border rounded"
           >
             <option value="">All Teams</option>
-            {filteredTeams.map(team => (
+            {displayedTeams.map(team => (
               <option key={team.id} value={team.name}>
                 {team.name}
               </option>
@@ -115,9 +135,9 @@ const News = () => {
       </div>
 
       <div className="w-full max-w-full mx-auto h-96 overflow-y-auto">
-        {filteredArticles.length > 0 ? (
+        {getFilteredArticles().length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredArticles.map(article => (
+            {getFilteredArticles().map(article => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>

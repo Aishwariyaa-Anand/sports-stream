@@ -15,7 +15,6 @@ const LiveCard = ({ match }) => {
       const data = await response.json();
       setMatchDetails(data);
       setLastRefresh(new Date().toLocaleTimeString());
-      console.log("Last refreshed at: ",lastRefresh,"for the match",match.name)
     } catch (error) {
       console.error('Error fetching match details:', error);
     }

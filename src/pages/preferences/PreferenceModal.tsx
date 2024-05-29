@@ -16,7 +16,6 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       try {
         const response = await fetch(`${API_ENDPOINT}/sports`);
         const data = await response.json();
-        console.log('Fetched sports data:', data);
         if (data.sports && Array.isArray(data.sports)) {
           setSports(data.sports);
         } else {
@@ -31,7 +30,6 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       try {
         const response = await fetch(`${API_ENDPOINT}/teams`);
         const data = await response.json();
-        console.log('Fetched teams data:', data);
         if (Array.isArray(data)) {
           setTeams(data);
         } else {
@@ -42,6 +40,27 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       }
     };
 
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINT}/user/preferences`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
+        const data = await response.json();
+        console.log('Fetched preferences data:', data);
+        
+        // Update selected sports and teams with fetched preferences
+        setSelectedSports(data.preferences.sports || []);
+        setSelectedTeams(data.preferences.teams || []);
+      } catch (error) {
+        console.error('Failed to fetch preferences', error);
+      }
+    };
+
+    fetchPreferences();
     fetchSports();
     fetchTeams();
   }, []);
@@ -55,13 +74,23 @@ const PreferenceModal = ({ isOpen, onClose }) => {
 
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const updatedPreferences = {
+        sports: selectedSports,
+        teams: selectedTeams
+      };
+
       const response = await fetch(`${API_ENDPOINT}/user/preferences`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ preferences }),
+        body: JSON.stringify({ preferences: updatedPreferences }),
       });
 
       if (!response.ok) {
@@ -69,8 +98,8 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       }
 
       const data = await response.json();
-      setPreferences(data);
       console.log(data);
+      setPreferences(data.preferences);
       onClose();
     } catch (error) {
       console.error('Failed to save preferences', error);
