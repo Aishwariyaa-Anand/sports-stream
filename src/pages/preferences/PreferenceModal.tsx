@@ -1,11 +1,11 @@
+import React, { useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment } from 'react';
 import { API_ENDPOINT } from '../../config/constants';
 import { useAuth } from '../../context/AuthContext';
-import React from 'react';
 
 const PreferenceModal = ({ isOpen, onClose }) => {
-  const { preferences, setPreferences } = useAuth();
+  const { user, preferences, setPreferences } = useAuth();
   const [sports, setSports] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedSports, setSelectedSports] = useState([]);
@@ -16,11 +16,7 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       try {
         const response = await fetch(`${API_ENDPOINT}/sports`);
         const data = await response.json();
-        if (data.sports && Array.isArray(data.sports)) {
-          setSports(data.sports);
-        } else {
-          console.error('Unexpected response format for sports');
-        }
+        setSports(data.sports);
       } catch (error) {
         console.error('Failed to fetch sports', error);
       }
@@ -30,37 +26,12 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       try {
         const response = await fetch(`${API_ENDPOINT}/teams`);
         const data = await response.json();
-        if (Array.isArray(data)) {
-          setTeams(data);
-        } else {
-          console.error('Unexpected response format for teams');
-        }
+        setTeams(data);
       } catch (error) {
         console.error('Failed to fetch teams', error);
       }
     };
 
-    const fetchPreferences = async () => {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/user/preferences`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        });
-        const data = await response.json();
-        console.log('Fetched preferences data:', data);
-        
-        // Update selected sports and teams with fetched preferences
-        setSelectedSports(data.preferences.sports || []);
-        setSelectedTeams(data.preferences.teams || []);
-      } catch (error) {
-        console.error('Failed to fetch preferences', error);
-      }
-    };
-
-    fetchPreferences();
     fetchSports();
     fetchTeams();
   }, []);
@@ -98,7 +69,6 @@ const PreferenceModal = ({ isOpen, onClose }) => {
       }
 
       const data = await response.json();
-      console.log(data);
       setPreferences(data.preferences);
       onClose();
     } catch (error) {

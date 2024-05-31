@@ -1,30 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from './ArticleCard';
-import { API_ENDPOINT } from '../../config/constants';
+import { useArticlesState, useArticlesDispatch } from '../../context/article/context';
+import { fetchArticles } from '../../context/article/action';
 import { useAuth } from '../../context/AuthContext';
+import { API_ENDPOINT } from '../../config/constants';
 
 const News = () => {
   const { user, preferences } = useAuth();
-  const [articles, setArticles] = useState([]);
-  const [sports, setSports] = useState([]);
-  const [teams, setTeams] = useState([]);
+
+  const { articles, isLoading, isError, errorMessage } = useArticlesState();
+  const dispatch = useArticlesDispatch();
+
   const [selectedSport, setSelectedSport] = useState('');
   const [selectedTeam, setSelectedTeam] = useState('');
+  const [sports, setSports] = useState([]);
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/articles`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch articles');
-        }
-        const data = await response.json();
-        setArticles(data);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-      }
-    };
-
     const fetchSports = async () => {
       try {
         const response = await fetch(`${API_ENDPOINT}/sports`);
@@ -51,10 +43,11 @@ const News = () => {
       }
     };
 
-    fetchArticles();
+
+    fetchArticles(dispatch);
     fetchSports();
     fetchTeams();
-  }, []);
+  }, [dispatch]);
 
   const handleSportChange = (sport) => {
     setSelectedSport(sport);
@@ -69,29 +62,33 @@ const News = () => {
     let filtered = articles;
     if (user && preferences) {
       filtered = filtered.filter(article =>
-        (article.sport && preferences.preferences.sports.includes(article.sport.id)) ||
-        (article.teams && article.teams.some(team => preferences.preferences.teams.includes(team.id)))
+        (article.sport && preferences.sports.includes(article.sport.id)) ||
+        (article.teams && article.teams.some(team => preferences.teams.includes(team.id)))
       );
     }
+  
     if (selectedSport) {
       filtered = filtered.filter(article => article.sport && article.sport.name === selectedSport);
     }
     if (selectedTeam) {
       filtered = filtered.filter(article => article.teams && article.teams.some(team => team.name === selectedTeam));
     }
+  
     return filtered;
   };
 
 
-  const displayedSports = user && preferences && preferences.preferences && preferences.preferences.sports ? sports.filter(sport => preferences.preferences.sports.includes(sport.id)) : sports;
+  const displayedSports = user && preferences && preferences.sports ? sports.filter(sport => preferences.sports.includes(sport.id)) : sports;
   const displayedTeams = selectedSport
-    ? (user && preferences && preferences.preferences && preferences.preferences.teams) 
-      ? teams.filter(team => preferences.preferences.teams.includes(team.id) && team.plays === selectedSport) 
+    ? (user && preferences && preferences.teams) 
+      ? teams.filter(team => preferences.teams.includes(team.id) && team.plays === selectedSport) 
       : teams.filter(team => team.plays === selectedSport)
-    : user && preferences && preferences.preferences && preferences.preferences.teams
-    ? teams.filter(team => preferences.preferences.teams.includes(team.id))
+    : user && preferences && preferences.teams
+    ? teams.filter(team => preferences.teams.includes(team.id))
     : teams;
 
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error: {errorMessage}</p>;
 
   return (
     <div>
@@ -142,7 +139,12 @@ const News = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-500">No articles available for the selected filter.</p>
+          <p className="text-center text-gray-500">
+            {user && preferences && preferences.sports.length === 0 && preferences.teams.length === 0
+              ? "You haven't selected any preferred sports or teams yet."
+              : "No articles available for the selected filter."
+            }
+          </p>
         )}
       </div>
     </div>
