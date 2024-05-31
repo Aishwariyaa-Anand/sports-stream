@@ -4,7 +4,6 @@ import { FaSync } from 'react-icons/fa';
 
 const LiveCard = ({ match }) => {
   const [matchDetails, setMatchDetails] = useState(null);
-  const [lastRefresh, setLastRefresh] = useState();
 
   const fetchMatchDetails = async () => {
     try {
@@ -14,7 +13,6 @@ const LiveCard = ({ match }) => {
       }
       const data = await response.json();
       setMatchDetails(data);
-      setLastRefresh(new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Error fetching match details:', error);
     }

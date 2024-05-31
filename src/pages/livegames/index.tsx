@@ -1,34 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import LiveCard from './LiveCard';
-import { API_ENDPOINT } from '../../config/constants';
+import { useMatchesState, useMatchesDispatch } from '../../context/matches/context';
+import { fetchMatches } from '../../context/matches/action';
 
 const LiveGames = () => {
-  const [matches, setMatches] = useState([]);
+  const { matches, isLoading, isError, errorMessage } = useMatchesState();
+  const dispatch = useMatchesDispatch();
 
-  // Fetch ongoing matches from the API
   useEffect(() => {
-    const fetchMatches = async () => {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/matches`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch matches');
-        }
-        const data = await response.json();
-        setMatches(data.matches.filter(match => match.isRunning));
-      } catch (error) {
-        console.error('Error fetching matches:', error);
-      }
-    };
+    fetchMatches(dispatch);
+  }, [dispatch]);
 
-    fetchMatches();
-  }, []);
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error: {errorMessage}</p>;
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Live Games</h1>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {matches.map(match => (
-          <LiveCard match={match} />
+          <LiveCard key={match.id} match={match} />
         ))}
       </div>
     </div>

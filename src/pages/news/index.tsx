@@ -79,10 +79,7 @@ const News = () => {
 
 
   const displayedSports = user && preferences && preferences.sports ? sports.filter(sport => preferences.sports.includes(sport.id)) : sports;
-  const displayedTeams = selectedSport
-    ? (user && preferences && preferences.teams) 
-      ? teams.filter(team => preferences.teams.includes(team.id) && team.plays === selectedSport) 
-      : teams.filter(team => team.plays === selectedSport)
+  const displayedTeams = selectedSport? teams.filter(team => team.plays === selectedSport)
     : user && preferences && preferences.teams
     ? teams.filter(team => preferences.teams.includes(team.id))
     : teams;
@@ -92,7 +89,25 @@ const News = () => {
 
   return (
     <div>
+      <div className="mb-2 flex justify-between items-center">
       <h1 className="text-2xl font-bold mb-4">Trending News</h1>
+      <div className="ml-4">
+          <label htmlFor="team-filter" className="mr-2">Filter by Team:</label>
+          <select
+            id="team-filter"
+            value={selectedTeam}
+            onChange={handleTeamChange}
+            className="p-2 border rounded"
+          >
+            <option value="">All Teams</option>
+            {displayedTeams.map(team => (
+              <option key={team.id} value={team.name}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       
       <div className="mb-4 flex justify-between items-center">
         <div className="flex space-x-4 overflow-x-auto">
@@ -111,23 +126,6 @@ const News = () => {
               {sport.name}
             </button>
           ))}
-        </div>
-
-        <div className="ml-4">
-          <label htmlFor="team-filter" className="mr-2">Filter by Team:</label>
-          <select
-            id="team-filter"
-            value={selectedTeam}
-            onChange={handleTeamChange}
-            className="p-2 border rounded"
-          >
-            <option value="">All Teams</option>
-            {displayedTeams.map(team => (
-              <option key={team.id} value={team.name}>
-                {team.name}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 

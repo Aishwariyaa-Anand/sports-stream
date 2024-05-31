@@ -8,14 +8,13 @@ const Dashboard = () => {
   return (
     <div className="flex w-full flex-col h-screen">
       <Navbar />
-      <ChangePass />
-        <div className="h-1/4 bg-light-blue-50 w-full">
+        <div className="h-1/3 bg-light-blue-50 w-full">
           <div className='px-4'>
-            <LiveGames />
             <br />
+            <LiveGames />
           </div>
         </div>
-        <div className="h-3/4 bg-light-blue-100 w-full">
+        <div className="h-2/3 bg-light-blue-100 w-full">
           <div className='px-4'>
             <br />
             <News />
