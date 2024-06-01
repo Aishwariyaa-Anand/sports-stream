@@ -2,7 +2,6 @@ import React from 'react';
 import Navbar from '../../layout/dashboard/navbar';
 import LiveGames from '../livegames';
 import News from '../news';
-import ChangePass from '../changepass';
 
 const Dashboard = () => {
   return (

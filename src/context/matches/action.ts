@@ -21,7 +21,6 @@ export const fetchMatchDetails = async (dispatch: React.Dispatch<MatchesActions>
         throw new Error('Failed to fetch match details');
       }
       const data = await response.json();
-      console.log(data);
       dispatch({ type: 'FETCH_MATCH_DETAILS_SUCCESS', payload: data });
     } catch (error) {
       console.error('Error fetching match details:', error);
