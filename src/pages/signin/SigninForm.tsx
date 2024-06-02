@@ -12,7 +12,7 @@ const SigninForm: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(''); // Clear previous errors
+    setError('');
     try {
       const response = await fetch(`${API_ENDPOINT}/users/sign_in`, {
         method: 'POST',
@@ -44,11 +44,6 @@ const SigninForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-4 border border-blue-200 rounded-md shadow-md">
-      {error && (
-        <div className="mb-4 text-red-500 font-semibold">
-          {error}
-        </div>
-      )}
       <div>
         <label className="block text-blue-700 font-semibold mb-2">Email:</label>
         <input
@@ -71,6 +66,11 @@ const SigninForm: React.FC = () => {
           className="w-full border border-blue-300 rounded-md py-2 px-3 text-blue-700 leading-tight focus:outline-none focus:border-light-blue-500 focus:shadow-outline-light-blue"
         />
       </div>
+      {error && (
+        <div className="mb-4 text-red-500 font-semibold">
+          {error}
+        </div>
+      )}
       <button
         type="submit"
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline-blue mt-4"
