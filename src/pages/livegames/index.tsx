@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import LiveCard from './LiveCard';
+const LiveCard = React.lazy(() => import('./LiveCard'));
 import { useMatchesState, useMatchesDispatch } from '../../context/matches/context';
 import { fetchMatches } from '../../context/matches/action';
+import { Suspense } from "react";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
 const LiveGames = () => {
   const { matches, isLoading, isError, errorMessage } = useMatchesState();
@@ -15,14 +17,20 @@ const LiveGames = () => {
   if (isError) return <p>Error: {errorMessage}</p>;
 
   return (
+    <>
     <div>
       <h1 className="text-2xl font-bold mb-4">Live Games</h1>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {matches.map(match => (
-          <LiveCard key={match.id} match={match} />
+          <ErrorBoundary>
+          <Suspense fallback={<div>Loading Live Games...</div>}>
+            <LiveCard key={match.id} match={match} />
+          </Suspense>
+          </ErrorBoundary>
         ))}
       </div>
     </div>
+    </>
   );
 };
 

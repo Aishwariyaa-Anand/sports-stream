@@ -1,9 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import Signin from "../pages/signin";
-import Signup from "../pages/signup";
-import Dashboard from "../pages/dashboard";
+const Signin = React.lazy(() => import("../pages/signin"));
+const Signup = React.lazy(() => import("../pages/signup"));
+const Dashboard = React.lazy(() => import("../pages/dashboard"));
 
 const router = createBrowserRouter([
   { path: "/", element: <Dashboard /> },

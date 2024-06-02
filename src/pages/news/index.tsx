@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import ArticleCard from './ArticleCard';
+const ArticleCard = React.lazy(() => import('./ArticleCard'));
 import { useArticlesState, useArticlesDispatch } from '../../context/article/context';
 import { fetchArticles } from '../../context/article/action';
 import { useAuth } from '../../context/AuthContext';
 import { API_ENDPOINT } from '../../config/constants';
+import { Suspense } from "react";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
 const News = () => {
   const { user, preferences } = useAuth();
@@ -133,7 +135,11 @@ const News = () => {
         {getFilteredArticles().length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {getFilteredArticles().map(article => (
-              <ArticleCard key={article.id} article={article} />
+              <ErrorBoundary>
+              <Suspense fallback={<div>Loading Articles...</div>}>
+                <ArticleCard key={article.id} article={article} />
+              </Suspense>
+              </ErrorBoundary>
             ))}
           </div>
         ) : (

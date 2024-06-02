@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINT } from '../../config/constants';
 import { useAuth } from '../../context/AuthContext';
@@ -7,10 +7,12 @@ const SigninForm: React.FC = () => {
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(''); // Clear previous errors
     try {
       const response = await fetch(`${API_ENDPOINT}/users/sign_in`, {
         method: 'POST',
@@ -19,21 +21,19 @@ const SigninForm: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Sign-in failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Sign-in failed');
       }
 
       console.log('Sign-in successful');
       
-      // extract the response body as JSON data
       const data = await response.json();
-
-      // After successful signin, first we will save the token in localStorage
       localStorage.setItem('authToken', data.auth_token);
       localStorage.setItem('userData', JSON.stringify(data.user));
       signIn(data.user);
       navigate("/dashboard");
-
     } catch (error) {
+      setError(error.message);
       console.error('Sign-in failed:', error);
     }
   };
@@ -44,6 +44,11 @@ const SigninForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-4 border border-blue-200 rounded-md shadow-md">
+      {error && (
+        <div className="mb-4 text-red-500 font-semibold">
+          {error}
+        </div>
+      )}
       <div>
         <label className="block text-blue-700 font-semibold mb-2">Email:</label>
         <input
