@@ -29,3 +29,7 @@ To better understand our target users and their needs, we've identified two key 
 
 Click on the link to direct to the website
 https://sportssstream.netlify.app/
+
+Any doubts on navigations through website, refer the video below
+
+https://www.loom.com/share/4bc54e0969064344a56a1f2cd0b2eafe?sid=2cb80fcf-b387-4bf4-9fa8-c405175431fd
