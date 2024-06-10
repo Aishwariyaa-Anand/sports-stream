@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
-const ArticleCard = React.lazy(() => import('./ArticleCard'));
+import React, { useEffect, useState, Suspense } from 'react';
 import { useArticlesState, useArticlesDispatch } from '../../context/article/context';
 import { fetchArticles } from '../../context/article/action';
 import { useAuth } from '../../context/AuthContext';
 import { API_ENDPOINT } from '../../config/constants';
-import { Suspense } from "react";
 import ErrorBoundary from "../../components/ErrorBoundary";
 
-const News = () => {
-  const { user, preferences } = useAuth();
+const ArticleCard = React.lazy(() => import('./ArticleCard'));
 
+const News = () => {
+  const { user, preferences = { sports: [], teams: [] } } = useAuth();
   const { articles, isLoading, isError, errorMessage } = useArticlesState();
   const dispatch = useArticlesDispatch();
 
@@ -45,7 +44,6 @@ const News = () => {
       }
     };
 
-
     fetchArticles(dispatch);
     fetchSports();
     fetchTeams();
@@ -62,25 +60,31 @@ const News = () => {
 
   const getFilteredArticles = () => {
     let filtered = articles;
+
     if (user && preferences) {
-      filtered = filtered.filter(article =>
-        (article.sport && preferences.sports.includes(article.sport.id)) ||
-        (article.teams && article.teams.some(team => preferences.teams.includes(team.id)))
-      );
+      const { sports: userSports, teams: userTeams } = preferences;
+
+      if ((userSports && Array.isArray(userSports)) || (userTeams && Array.isArray(userTeams))) {
+        filtered = filtered.filter(article =>
+          (article.sport && userSports.includes(article.sport.id)) ||
+          (article.teams && article.teams.some(team => userTeams.includes(team.id)))
+        );
+      }
     }
-  
+
     if (selectedSport) {
       filtered = filtered.filter(article => article.sport && article.sport.name === selectedSport);
     }
+    
     if (selectedTeam) {
       filtered = filtered.filter(article => article.teams && article.teams.some(team => team.name === selectedTeam));
     }
-  
+
     return filtered;
   };
 
-
   const displayedSports = user && preferences && preferences.sports ? sports.filter(sport => preferences.sports.includes(sport.id)) : sports;
+  
   const displayedTeams = selectedSport? teams.filter(team => team.plays === selectedSport)
     : user && preferences && preferences.teams
     ? teams.filter(team => preferences.teams.includes(team.id))
@@ -92,8 +96,8 @@ const News = () => {
   return (
     <div>
       <div className="mb-2 flex justify-between items-center">
-      <h1 className="text-2xl font-bold mb-4">Trending News</h1>
-      <div className="ml-4">
+        <h1 className="text-2xl font-bold mb-4">Trending News</h1>
+        <div className="ml-4">
           <label htmlFor="team-filter" className="mr-2">Filter by Team:</label>
           <select
             id="team-filter"
@@ -110,7 +114,7 @@ const News = () => {
           </select>
         </div>
       </div>
-      
+
       <div className="mb-4 flex justify-between items-center">
         <div className="flex space-x-4 overflow-x-auto">
           <button
@@ -135,16 +139,16 @@ const News = () => {
         {getFilteredArticles().length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {getFilteredArticles().map(article => (
-              <ErrorBoundary>
-              <Suspense fallback={<div>Loading Articles...</div>}>
-                <ArticleCard key={article.id} article={article} />
-              </Suspense>
+              <ErrorBoundary key={article.id}>
+                <Suspense fallback={<div>Loading Articles...</div>}>
+                  <ArticleCard article={article} />
+                </Suspense>
               </ErrorBoundary>
             ))}
           </div>
         ) : (
           <p className="text-center text-gray-500">
-            {user && preferences && preferences.sports.length === 0 && preferences.teams.length === 0
+            {user && preferences && Array.isArray(preferences.sports) && Array.isArray(preferences.teams) && preferences.sports.length === 0 && preferences.teams.length === 0
               ? "You haven't selected any preferred sports or teams yet."
               : "No articles available for the selected filter."
             }

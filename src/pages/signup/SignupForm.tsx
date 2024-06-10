@@ -30,6 +30,17 @@ const SignupForm: React.FC = () => {
 
       localStorage.setItem('authToken', data.auth_token);
       localStorage.setItem('userData', JSON.stringify(data.user));
+
+      // settin preferences to null
+      await fetch(`${API_ENDPOINT}/user/preferences`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ preferences: { sports: [], teams: [] } }),
+      });
+
       signIn(data.user);
       navigate("/dashboard");
       
